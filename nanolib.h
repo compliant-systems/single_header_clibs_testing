@@ -26,10 +26,10 @@
 
 #ifndef DBJ_ASSERT
 
-#define DBJ_ASSERT(x)                   \
-    if (!(x))                           \
-    {                                   \
-        _DBJ_TERROR(#x " -- FAILED !"); \
+#define DBJ_ASSERT(x)                       \
+    if (!(x))                               \
+    {                                       \
+        _DBJ_TERROR(" %s -- FAILED !", #x); \
     }
 
 #endif // DBJ_ASSERT

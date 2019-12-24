@@ -13,7 +13,8 @@
 
 #include "../single_header_clibs/assetsys.h"
 
-#include <stdio.h> // for printf
+#include <memory>
+#include "scope_guard.hpp"
 
 void list_assets(assetsys_t *assetsys, char const *path, int indent)
 {
@@ -42,6 +43,8 @@ void list_assets(assetsys_t *assetsys, char const *path, int indent)
 int main(int, char **)
 {
     assetsys_t *assetsys = assetsys_create(0);
+    auto guard = sg::make_scope_guard([&] { assetsys_destroy(assetsys); });
+
     // Mount current working folder as a virtual "/data" path
     //    assetsys_mount(assetsys, ".", "/data");
     // or
@@ -61,13 +64,14 @@ int main(int, char **)
     int size = assetsys_file_size(assetsys, file);
 
     // char *content = (char *)malloc(size + 1); // extra space for '\0'
-    char *content = dbj::aligned_malloc_char(32, size + 1);
+    // char *content = dbj::aligned_malloc_char(32, size + 1);
+    auto content = std::make_unique<char[]>(size + 1);
 
     int loaded_size = 0;
-    assetsys_file_load(assetsys, file, &loaded_size, content, size);
+    assetsys_file_load(assetsys, file, &loaded_size, content.get(), size);
     content[size] = '\0'; // zero terminate the text file
-    printf("%s\n", content);
-    free(content);
+    printf("%s\n", content.get());
+    // free(content);
 
-    assetsys_destroy(assetsys);
+    // assetsys_destroy(assetsys);
 }
