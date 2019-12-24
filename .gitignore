@@ -1,0 +1,12 @@
+# Visual Studio Code artifacts
+# .vscode/*
+.history/*
+
+# Visual Studio artifacts
+.vs
+
+# C/C++ build outputs
+*.ilk
+*.exe
+*.pdb
+*.obj
