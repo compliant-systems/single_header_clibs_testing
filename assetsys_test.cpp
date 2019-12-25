@@ -6,12 +6,12 @@
 #define ASSETSYS_MALLOC(ctx, size) (dbj::aligned_malloc(size))
 #define ASSETSYS_FREE(ctx, ptr) (dbj::aligned_free(ptr))
 #define ASSETSYS_ASSERT(condition) (DBJ_ASSERT(condition))
-// #define ASSETSYS_ASSERT(condition) (assert(condition))
 
 #define STRPOOL_IMPLEMENTATION
 #define STRPOOL_MALLOC(ctx, size) (dbj::aligned_malloc(size))
 #define STRPOOL_FREE(ctx, ptr) (dbj::aligned_free(ptr))
-// #define STRPOOL_ASSERT(condition) (DBJ_ASSERT(condition))
+#define STRPOOL_ASSERT(condition) (DBJ_ASSERT(condition))
+
 namespace dbj
 {
 #include "../single_header_clibs/assetsys.h"
@@ -62,18 +62,33 @@ void list_assets(
 /*
 -------------------------------------------------------------------------
 */
-int main(int, char **)
+int main(int argc, char **argv)
 {
-    DBJ_ASSERT(true);
+    // no file dump requested
+    if (argc < 2)
+    {
+        printf"\n\n%s usage", argv[0] );
+        printf"\n\nFirst mandatory arg is folder you want listed");
+        printf"\n\nSecond optional arg is file from that folder you want dumped");
+        exit(EXIT_SUCCESS);
+    }
 
     dbj::assetsys_t *assetsys = dbj::assetsys_create(0);
     dbj::on_leaving leaver_{[&]() { dbj::assetsys_destroy(assetsys); }};
 
     // Mount ./json_samples folder as a virtual "/data" path
-    ASSYS_CALL(dbj::assetsys_mount(assetsys, "./json_samples", "/data"));
+    ASSYS_CALL(dbj::assetsys_mount(assetsys, argv[1], "/data"));
 
     // Print all files and subfolders
     list_assets(assetsys, "/", 0); // Start at root
+
+    // no file dump requested
+    if (argc < 3)
+        exit(EXIT_SUCCESS);
+
+    printf("\n\n------------------------------------------------------------------\n"
+           "File requested to be dumped: %s\n\n",
+           argv[2]);
 
     // Load a file
     dbj::assetsys_file_t file;
