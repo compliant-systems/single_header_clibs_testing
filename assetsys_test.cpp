@@ -1,10 +1,12 @@
 
 #include "nanolib.h"
+#include <assert.h>
 
 #define ASSETSYS_IMPLEMENTATION
 #define ASSETSYS_MALLOC(ctx, size) (dbj::aligned_malloc(size))
 #define ASSETSYS_FREE(ctx, ptr) (dbj::aligned_free(ptr))
-// #define ASSETSYS_ASSERT(condition) (DBJ_ASSERT(condition))
+#define ASSETSYS_ASSERT(condition) (DBJ_ASSERT(condition))
+// #define ASSETSYS_ASSERT(condition) (assert(condition))
 
 #define STRPOOL_IMPLEMENTATION
 #define STRPOOL_MALLOC(ctx, size) (dbj::aligned_malloc(size))
@@ -62,6 +64,8 @@ void list_assets(
 */
 int main(int, char **)
 {
+    DBJ_ASSERT(true);
+
     dbj::assetsys_t *assetsys = dbj::assetsys_create(0);
     dbj::on_leaving leaver_{[&]() { dbj::assetsys_destroy(assetsys); }};
 

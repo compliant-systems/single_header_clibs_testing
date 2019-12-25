@@ -7,30 +7,23 @@
 
 #ifndef _DBJ_LOG
 #define _DBJ_LOG(...)                                                            \
-    do                                                                           \
     {                                                                            \
         fprintf(stderr, "\n[%s] %s(%d) -- ", __TIMESTAMP__, __FILE__, __LINE__); \
         fprintf(stderr, __VA_ARGS__);                                            \
-    } while (false)
+    }
 
 #endif // _DBJ_LOG
 
-#ifndef _TERROR
-#define _DBJ_TERROR(...)       \
-    do                         \
-    {                          \
-        _DBJ_LOG(__VA_ARGS__); \
-        exit(EXIT_FAILURE);    \
-    } while (0)
+#ifndef _DBJ_TERROR
+inline auto _DBJ_TERROR = [](auto... args_) {
+    _DBJ_LOG(args_...);
+    exit(EXIT_FAILURE);
+};
 #endif // _DBJ_TERROR
 
 #ifndef DBJ_ASSERT
 
-#define DBJ_ASSERT(x)                       \
-    if (!(x))                               \
-    {                                       \
-        _DBJ_TERROR(" %s -- FAILED !", #x); \
-    }
+#define DBJ_ASSERT(x_) (void)((!!(x_)) || (_DBJ_TERROR((#x_)), 0))
 
 #endif // DBJ_ASSERT
 
@@ -84,10 +77,7 @@ inline void *aligned_malloc(size_t size)
 #endif
 
 #ifdef dbj_FAST_FAIL_POLICY
-    if (p == nullptr)
-    {
-        _DBJ_TERROR("aligned_malloc() failed! ");
-    }
+    DBJ_ASSERT(p != nullptr);
 #endif
     return p;
 }
