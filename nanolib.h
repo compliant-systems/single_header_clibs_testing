@@ -40,9 +40,29 @@
 
 #define dbj_FAST_FAIL_POLICY
 
-// stolen from simdbjson
 namespace dbj
 {
+using void_void_function_ptr = void (*)(void);
+// yes I am aware of: https://ricab.github.io/scope_guard/
+// but I do not see the point ;)
+template <typename Function_PTR = void_void_function_ptr>
+struct on_leaving final
+{
+    static Function_PTR null_call() {}
+    // much faster + cleaner vs giving nullptr
+    // no if in destructor required
+    const Function_PTR callable_{null_call};
+
+    explicit on_leaving(Function_PTR fun_) noexcept : callable_(fun_) {}
+
+    ~on_leaving()
+    {
+        // no if in destructor required
+        callable_();
+    }
+};
+
+// stolen from simdbjson
 // portable version of  posix_memalign
 inline void *aligned_malloc(size_t size)
 {
@@ -72,7 +92,7 @@ inline void *aligned_malloc(size_t size)
     return p;
 }
 
-inline char *aligned_malloc_char(size_t alignment, size_t size)
+inline char *aligned_malloc_char(size_t size)
 {
     return (char *)aligned_malloc(size);
 }

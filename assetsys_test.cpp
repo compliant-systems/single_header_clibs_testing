@@ -13,13 +13,21 @@
 
 #include "../single_header_clibs/assetsys.h"
 
-#include <memory>
-#include "scope_guard.hpp"
+#define ASSYS_CALL(x)                                               \
+    do                                                              \
+    {                                                               \
+        assetsys_error_t ass_err_ = (x);                            \
+        if (ass_err_ != assetsys_error_t::ASSETSYS_SUCCESS)         \
+        {                                                           \
+            _DBJ_TERROR(#x " has failed, with code: %d", ass_err_); \
+        }                                                           \
+    } while (0)
 
 void list_assets(assetsys_t *assetsys, char const *path, int indent)
 {
+    const int subdir_count = assetsys_subdir_count(assetsys, path);
     // Print folder names and recursively list assets
-    for (int i = 0; i < assetsys_subdir_count(assetsys, path); ++i)
+    for (int i = 0; i < subdir_count; ++i)
     {
         char const *subdir_name = assetsys_subdir_name(assetsys, path, i);
         for (int j = 0; j < indent; ++j)
@@ -30,8 +38,9 @@ void list_assets(assetsys_t *assetsys, char const *path, int indent)
         list_assets(assetsys, subdir_path, indent + 1);
     }
 
+    const int file_count = assetsys_file_count(assetsys, path);
     // Print file names
-    for (int i = 0; i < assetsys_file_count(assetsys, path); ++i)
+    for (int i = 0; i < file_count; ++i)
     {
         char const *file_name = assetsys_file_name(assetsys, path, i);
         for (int j = 0; j < indent; ++j)
@@ -43,35 +52,26 @@ void list_assets(assetsys_t *assetsys, char const *path, int indent)
 int main(int, char **)
 {
     assetsys_t *assetsys = assetsys_create(0);
-    auto guard = sg::make_scope_guard([&] { assetsys_destroy(assetsys); });
+    dbj::on_leaving leaver_{[&]() { assetsys_destroy(assetsys); }};
 
-    // Mount current working folder as a virtual "/data" path
-    //    assetsys_mount(assetsys, ".", "/data");
-    // or
-    assetsys_error_t ass_err_ = assetsys_mount(assetsys, "./json_samples", "/data");
-
-    if (ass_err_ != assetsys_error_t::ASSETSYS_SUCCESS)
-    {
-        _DBJ_TERROR("assetsys_mount() has failed, with code: %d", ass_err_);
-    }
+    // Mount ./json_samples folder as a virtual "/data" path
+    ASSYS_CALL(assetsys_mount(assetsys, "./json_samples", "/data"));
 
     // Print all files and subfolders
     list_assets(assetsys, "/", 0); // Start at root
 
     // Load a file
     assetsys_file_t file;
-    assetsys_file(assetsys, "/data/twitter.json", &file);
+    ASSYS_CALL(assetsys_file(assetsys, "/data/twitter.json", &file));
     int size = assetsys_file_size(assetsys, file);
 
-    // char *content = (char *)malloc(size + 1); // extra space for '\0'
-    // char *content = dbj::aligned_malloc_char(32, size + 1);
-    auto content = std::make_unique<char[]>(size + 1);
+    // app exits on alloc failure
+    // extra space for '\0'
+    char *content = dbj::aligned_malloc_char(size + 1);
+    dbj::on_leaving liberate_{[&]() { dbj::aligned_free_char(content); }};
 
     int loaded_size = 0;
-    assetsys_file_load(assetsys, file, &loaded_size, content.get(), size);
+    ASSYS_CALL(assetsys_file_load(assetsys, file, &loaded_size, content, size));
     content[size] = '\0'; // zero terminate the text file
-    printf("%s\n", content.get());
-    // free(content);
-
-    // assetsys_destroy(assetsys);
+    printf("%s\n", content);
 }

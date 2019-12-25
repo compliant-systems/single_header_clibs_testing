@@ -1,5 +1,5 @@
 # Visual Studio Code artifacts
-.vscode/*
+# .vscode/*
 .history/*
 
 # Visual Studio artifacts

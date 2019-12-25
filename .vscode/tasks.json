@@ -2,13 +2,33 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "msvc build",
+            "label": "msvc debug build",
             "type": "shell",
             "command": "cl.exe",
             "args": [
                 "/std:c++17",
                 "/EHsc",
                 "/Zi",
+                "/Fe:",
+                "assetsys_test_dbg.exe",
+                "assetsys_test.cpp"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "msvc release build",
+            "type": "shell",
+            "command": "cl.exe",
+            "args": [
+                "/std:c++17",
+                "/EHsc",
                 "/Fe:",
                 "assetsys_test.exe",
                 "assetsys_test.cpp"
