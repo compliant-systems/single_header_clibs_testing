@@ -13,6 +13,9 @@
 
 #include "../single_header_clibs/assetsys.h"
 
+/*
+-------------------------------------------------------------------------
+*/
 #define ASSYS_CALL(x)                                               \
     do                                                              \
     {                                                               \
@@ -23,6 +26,9 @@
         }                                                           \
     } while (0)
 
+/*
+-------------------------------------------------------------------------
+*/
 void list_assets(assetsys_t *assetsys, char const *path, int indent)
 {
     const int subdir_count = assetsys_subdir_count(assetsys, path);
@@ -48,7 +54,9 @@ void list_assets(assetsys_t *assetsys, char const *path, int indent)
         printf("%s\n", file_name);
     }
 }
-
+/*
+-------------------------------------------------------------------------
+*/
 int main(int, char **)
 {
     assetsys_t *assetsys = assetsys_create(0);
