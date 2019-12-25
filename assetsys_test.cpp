@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     dbj::assetsys_t *assetsys = dbj::assetsys_create(0);
     dbj::on_leaving leaver_{[&]() { dbj::assetsys_destroy(assetsys); }};
 
-    // Mount ./json_samples folder as a virtual "/data" path
+    // Try to mount required folder as a virtual "/data" path
     ASSYS_CALL(dbj::assetsys_mount(assetsys, argv[1], "/data"));
 
     printf("\n\n%s is mounted as: %s\n\n", argv[1], "/data");
