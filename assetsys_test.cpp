@@ -2,10 +2,14 @@
 #include "nanolib.h"
 #include <assert.h>
 
+// we define our aligned alloca/free to be used
+
 #define ASSETSYS_IMPLEMENTATION
 #define ASSETSYS_MALLOC(ctx, size) (dbj::aligned_malloc(size))
 #define ASSETSYS_FREE(ctx, ptr) (dbj::aligned_free(ptr))
 #define ASSETSYS_ASSERT(condition) (DBJ_ASSERT(condition))
+
+// asset sys include strpool 
 
 #define STRPOOL_IMPLEMENTATION
 #define STRPOOL_MALLOC(ctx, size) (dbj::aligned_malloc(size))
@@ -14,7 +18,8 @@
 
 namespace dbj
 {
-#include "../single_header_clibs/assetsys.h"
+// libs is git submodule here
+#include "libs/assetsys.h"
 } // namespace dbj
 
 /*
