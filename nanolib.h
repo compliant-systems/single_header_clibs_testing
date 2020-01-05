@@ -1,29 +1,29 @@
-#ifndef _DBJ_NANOLIB_INC_
-#define _DBJ_NANOLIB_INC_
+#ifndef DBJ_NANOLIB_INC_
+#define DBJ_NANOLIB_INC_
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
 
-#ifndef _DBJ_LOG
-#define _DBJ_LOG(...)                                                            \
+#ifndef DBJ_LOG
+#define DBJ_LOG(...)                                                            \
     {                                                                            \
         fprintf(stderr, "\n[%s] %s(%d) -- ", __TIMESTAMP__, __FILE__, __LINE__); \
         fprintf(stderr, __VA_ARGS__);                                            \
     }
 
-#endif // _DBJ_LOG
+#endif // DBJ_LOG
 
-#ifndef _DBJ_TERROR
-inline auto _DBJ_TERROR = [](auto... args_) {
-    _DBJ_LOG(args_...);
+#ifndef DBJ_TERROR
+inline auto DBJ_TERROR = [](auto... args_) {
+    DBJ_LOG(args_...);
     exit(EXIT_FAILURE);
 };
-#endif // _DBJ_TERROR
+#endif // DBJ_TERROR
 
 #ifndef DBJ_ASSERT
 
-#define DBJ_ASSERT(x_) (void)((!!(x_)) || (_DBJ_TERROR((#x_)), 0))
+#define DBJ_ASSERT(x_) (void)((!!(x_)) || (DBJ_TERROR((#x_)), 0))
 
 #endif // DBJ_ASSERT
 
@@ -43,7 +43,7 @@ struct on_leaving final
 {
     static Function_PTR null_call() {}
     // much faster + cleaner vs giving nullptr
-    // no if in destructor required
+    // no if() in destructor required
     const Function_PTR callable_{null_call};
 
     explicit on_leaving(Function_PTR fun_) noexcept : callable_(fun_) {}
@@ -109,4 +109,4 @@ inline void aligned_free_char(char *mem_block)
 
 } // namespace dbj
 
-#endif // _DBJ_NANOLIB_INC_
+#endif // DBJ_NANOLIB_INC_

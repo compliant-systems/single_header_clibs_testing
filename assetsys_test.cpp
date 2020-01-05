@@ -31,7 +31,7 @@ namespace dbj
         dbj::assetsys_error_t ass_err_ = (x);                       \
         if (ass_err_ != dbj::assetsys_error_t::ASSETSYS_SUCCESS)    \
         {                                                           \
-            _DBJ_TERROR(#x " has failed, with code: %d", ass_err_); \
+            DBJ_TERROR(#x " has failed, with code: %d", ass_err_); \
         }                                                           \
     } while (0)
 
